@@ -1,0 +1,146 @@
+#! /bin/bash
+set -x #verbose
+#############################This script inject faults in different modules in mor1kx microprocessor
+############################Overall it injects 8000 single bit flip error in microprocessor 
+#############################Written by Moslem Didehban CML Lab ASU
+
+############################Benchmark Dependent information
+RUNTIME=3369335
+TIMEOUT=5369335
+BENCHMARK=MM #input is small
+Version=SWIFT-DF-WDC
+Binary=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/Files/$Version
+GOLDEN=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/Golden
+timelog=$GOLDEN/mor1kx-trace-time.log
+NUMOFLINES=$(wc -l < "$timelog")
+ICARUS=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/mor1kx-generic_0/sim-icarus
+
+
+
+###########################Actual Fault injection starts from here
+#############################we target 216 bits in DecodeExecute stage and for each bit we inject 6 faults
+############################Therfore in total we need to inject 1300
+Component=DecodeExecute
+Path=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/$Component
+COUNTER=1300
+FIbit=1
+FItime=1
+FIcomponent=6  ## means DecodeExecute
+FItarget=1
+ until [  $COUNTER -lt 0 ]; do
+
+	    FIbit=$(( $RANDOM % 216 )) # 216 bits in decodeToexecute stage
+	    FItimeline=$(shuf -i 1-$NUMOFLINES -n 1)
+	    FItime=$(sed "${FItimeline}q;d" "$timelog")
+            echo FIBIT: $FIbit
+            echo FITIME: $FItime
+            FItarget=$Path/FI-$FIbit-$FItime
+            mkdir $FItarget
+            cd    $FItarget
+	    vvp -n -M$ICARUS/  -l icarus.log -melf-loader_1.0.1 -mjtag_vpi_0-r2 $ICARUS/fusesoc.elf -lxt2 +FIbit=$FIbit +elf_load=$Binary +FItime=$FItime +timeout=$TIMEOUT +FIcomponent=$FIcomponent
+ 	    let COUNTER-=1
+        done
+
+
+
+#vvp -n -M /home/abudhira/Downloads/LLVM-or1k/Programs/MM/NEMESIS-NAIVE/mor1kx-generic_0/sim-icarus/  -l icarus.log -melf-loader_1.0.1 -mjtag_vpi_0-r2 /home/abudhira/Downloads/LLVM-or1k/Programs/MM/NEMESIS-NAIVE/mor1kx-generic_0/sim-icarus/fusesoc.elf -lxt2 +FIbit=2 +elf_load=/home/abudhira/Downloads/LLVM-or1k/Programs/MM/Files/MM-NEMESIS-naive +FItime=319395  +FIcomponent=1
+
+#############################we target 199 bits in Decoder stage and for each bit we inject 6 faults
+############################Therfore in total we need to inject 1200
+
+Component=Decoder
+Path=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/$Component
+
+COUNTER=1200
+FIbit=1
+FItime=1
+FIcomponent=2 ## means Decoder
+FItarget=1
+ until [  $COUNTER -lt 0 ]; do
+
+	    FIbit=$(( $RANDOM % 200 ))
+	    FItimeline=$(shuf -i 1-$NUMOFLINES -n 1)
+	    FItime=$(sed "${FItimeline}q;d" "$timelog")
+            echo FIBIT: $FIbit
+            echo FITIME: $FItime
+            FItarget=$Path/FI-$FIbit-$FItime
+            mkdir $FItarget
+            cd    $FItarget
+	    vvp -n -M$ICARUS/  -l icarus.log -melf-loader_1.0.1 -mjtag_vpi_0-r2 $ICARUS/fusesoc.elf -lxt2 +FIbit=$FIbit +elf_load=$Binary +FItime=$FItime +timeout=$TIMEOUT +FIcomponent=$FIcomponent
+ 	    let COUNTER-=1
+        done
+#############################we target 183 bits in ExecuteCtrl stage and for each bit we inject 6 faults
+############################Therfore in total we need to inject 1100
+Component=ExecuteCtrl
+Path=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/$Component
+
+COUNTER=1100
+FIbit=1
+FItime=1
+FIcomponent=7 ## means ExecuteCtrl
+FItarget=1
+ until [  $COUNTER -lt 0 ]; do
+
+	    FIbit=$(( $RANDOM % 183 ))
+	    FItimeline=$(shuf -i 1-$NUMOFLINES -n 1)
+	    FItime=$(sed "${FItimeline}q;d" "$timelog")
+            echo FIBIT: $FIbit
+            echo FITIME: $FItime
+            FItarget=$Path/FI-$FIbit-$FItime
+            mkdir $FItarget
+            cd    $FItarget
+	    vvp -n -M$ICARUS/  -l icarus.log -melf-loader_1.0.1 -mjtag_vpi_0-r2 $ICARUS/fusesoc.elf -lxt2 +FIbit=$FIbit +elf_load=$Binary +FItime=$FItime +timeout=$TIMEOUT +FIcomponent=$FIcomponent
+ 	    let COUNTER-=1
+        done
+#############################we target 32*32 bits in registerfile stage and for each bit we inject 4 faults
+############################Therfore in total we need to inject 4000
+Component=RegisterFile
+Path=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/$Component
+
+COUNTER=4000
+FIbit=1
+FItime=1
+FIcomponent=5 ## means RegisterFile
+FItarget=1
+ until [  $COUNTER -lt 0 ]; do
+
+	    FIbit=$(( $RANDOM % 32 ))
+	    FItimeline=$(shuf -i 1-$NUMOFLINES -n 1)
+	    FItime=$(sed "${FItimeline}q;d" "$timelog")
+            echo FIBIT: $FIbit
+            echo FITIME: $FItime
+            FItarget=$Path/FI-$FIbit-$FItime
+            mkdir $FItarget
+            cd    $FItarget
+	    vvp -n -M$ICARUS/  -l icarus.log -melf-loader_1.0.1 -mjtag_vpi_0-r2 $ICARUS/fusesoc.elf -lxt2 +FIbit=$FIbit +elf_load=$Binary +FItime=$FItime +timeout=$TIMEOUT +FIcomponent=$FIcomponent
+ 	    let COUNTER-=1
+        done
+#############################we target 32 bits in writeback stage and for each bit we inject 6 faults
+############################Therfore in total we need to inject 200
+Component=WB
+Path=/home/abudhira/Downloads/LLVM-or1k/Programs/$BENCHMARK/$Version/$Component
+
+
+COUNTER=200
+FIbit=1
+FItime=1
+FIcomponent=9 ## means WB
+FItarget=1
+
+ until [  $COUNTER -lt 0 ]; do
+	    FIbit=$(( $RANDOM % 33 ))
+	    FItimeline=$(shuf -i 1-$NUMOFLINES -n 1)
+	    FItime=$(sed "${FItimeline}q;d" "$timelog")
+            echo FIBIT: $FIbit
+            echo FITIME: $FItime
+            FItarget=$Path/FI-$FIbit-$FItime
+            mkdir $FItarget
+            cd    $FItarget
+	    vvp -n -M$ICARUS/  -l icarus.log -melf-loader_1.0.1 -mjtag_vpi_0-r2 $ICARUS/fusesoc.elf -lxt2 +FIbit=$FIbit +elf_load=$Binary +FItime=$FItime +timeout=$TIMEOUT +FIcomponent=$FIcomponent
+ 	    let COUNTER-=1
+        done
+
+
+
+
+
